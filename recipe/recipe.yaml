@@ -4,7 +4,7 @@ schema_version: 1
 
 context:
   name: pyamrex
-  version: "26.07"
+  version: "26.08"
   build: 0
   mpi: ${{ mpi or "nompi" }}  # is this still needed?
   mpi_prefix: ${{ "nompi" if mpi == "nompi" else "mpi_" + mpi }}
@@ -15,7 +15,7 @@ package:
 
 source:
   url: https://github.com/AMReX-Codes/pyamrex/archive/refs/tags/${{ version }}.tar.gz
-  sha256: fd3fefff3c06f23fbad4426ba6b4222e89deaa648aff996fbaddbd15a73dd9a1
+  sha256: b99acb15ff90faa46337d544b10226c3055ef06e538f82a0d8ae247740923d1d
 
 build:
   skip:
@@ -42,10 +42,11 @@ requirements:
     # Injects -march=x86-64-v3 and adds an __archspec run-export so the package
     # only installs on v3-capable CPUs. This activation package is __unix-only;
     # Windows sets the flag in build.bat and adds the __archspec guard in run.
-    - if: unix and x86_64
-      then: x86_64-microarch-level ==${{ microarch_level | default(1) }}
     - if: unix
-      then: make
+      then:
+        - if: x86_64
+          then: x86_64-microarch-level ==${{ microarch_level | default(1) }}
+        - make
     - if: win
       then:
         - clang
